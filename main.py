@@ -1,27 +1,25 @@
 grid = [[0]]#maintain rectangleness, nonempty
 
-redistribution_count = [[0]]
+redistribution_count = {0: {0: 0}}
 
 def redistribute(r, c):
     assert grid[r][c] >= 4
-    if r == 0:
-        grid.insert(0, [0] * len(grid[0]))
-        redistribution_count.insert(0, [0] * len(grid[0]))
-        r += 1
-    if c == 0:
-        for row in grid:
-            row.insert(0, 0)
-        for row in redistribution_count:
-            row.insert(0, 0)
-        c += 1
-    if r == len(grid) - 1:
-        grid.append([0] * len(grid[0]))
-        redistribution_count.append([0] * len(grid[0]))
-    if c == len(grid[0]) - 1:
-        for row in grid:
-            row.append(0)
-        for row in redistribution_count:
-            row.append(0)
+    if r == min(grid.keys()):
+        grid[r-1] = dict.fromkeys(grid[r].keys(),0)
+        redistribution_count[r-1] = dict.fromkeys(grid[r].keys(),0)
+    if c == min(grid[0].keys()):
+        for row in grid.values():
+            row[c-1]=0
+        for row in redistribution_count.values():
+            row[c-1]=0
+    if r == max(grid.keys()):
+        grid[r+1] = dict.fromkeys(grid[r].keys(),0)
+        redistribution_count[r+1] = dict.fromkeys(grid[r].keys(),0)
+    if c == max(grid[0].keys()):
+        for row in grid.values():
+            row[c+1]=0
+        for row in redistribution_count.values():
+            row[c+1]=0
     grid[r][c] -= 4
     grid[r - 1][c] += 1
     grid[r + 1][c] += 1
@@ -31,34 +29,34 @@ def redistribute(r, c):
 
 
 def prettyPrint():
-    for row in grid:
-        print(" ".join(str(i) for i in row))
+    for row in range(min(grid.keys()), max(grid.keys())+1):
+        values = [grid[row][col] for col in range(min(grid[0].keys()), max(grid[0].keys())+1)]
+        print(" ".join(str(i) for i in values))
 
 
 def redistributeSomething():
-    for row in range(len(grid)):
-        for column in range(len(grid[row])):
+    rows = [i for i in grid.keys()]
+    columns = [j for j in grid[0].keys()]
+    for row in rows:
+        for column in columns:
             if (grid[row][column] >= 4):
                 redistribute(row, column)
                 return
 
 
 def redistributeBackwards():
-    for row in range(len(grid)):
-        row = len(grid) - row - 1
-        for column in range(len(grid[row])):
-            column = len(grid[row]) - column - 1
+    rows = [i for i in grid.keys()]
+    columns = [j for j in grid[0].keys()]
+    for row in rows:
+        for column in columns:
             if (grid[row][column] >= 4):
                 redistribute(row, column)
+                return
 
 
-grid = [[1000]]
+grid = {0: {0: 1000}}
 num_redistributions = 0
-while max([max(i) for i in grid]) >= 4:
+while max([max(i.values()) for i in grid.values()]) >= 4:
     redistributeSomething()
     num_redistributions += 1
-    if(num_redistributions % 100 == 0):
-        prettyPrint()
-        print("---------")
-grid = redistribution_count
 prettyPrint()
